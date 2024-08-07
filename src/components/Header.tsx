@@ -4,12 +4,19 @@ import logo from './images/logo.png'; // Adjust the path accordingly
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from 'react-router-dom';
 
-type Category = { id: number; name: string };
-type CategoriesProps = {
-    categories: Category[];
-};
+import { useEffect } from 'react';
+import { fetchCategories } from '../store/categoriesSlice';
+import { RootState, AppDispatch } from '../store';
+import { useSelector, useDispatch } from 'react-redux';
 
-const Header: React.FC<CategoriesProps> = ({ categories }) => {
+const Header: React.FC = () => {
+    const dispatch: AppDispatch = useDispatch();
+    const categories = useSelector((state: RootState) => state.categories.categories);
+
+    useEffect(() => {
+        dispatch(fetchCategories());
+    }, [dispatch]);
+
     return (
         <header className="header">
             <div className="container">
@@ -29,13 +36,13 @@ const Header: React.FC<CategoriesProps> = ({ categories }) => {
                                         <Link to="/">HomePage</Link>
                                     </li>
                                     <li>
-                                        <a href="./categories.html">
+                                        <Link to="/category">
                                             Categories <span className="arrow_carrot-down"></span>
-                                        </a>
+                                        </Link>
                                         <ul className="dropdown">
                                             {categories.map((category) => (
                                                 <li key={category.id}>
-                                                    <a href={`./category/${category.id}`}>{category.name}</a>
+                                                    <Link to={`/category/${category.id}`}>{category.name}</Link>
                                                 </li>
                                             ))}
                                         </ul>

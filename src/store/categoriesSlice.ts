@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './index';
 
-interface Category {
+export interface Category {
     id: number;
     name: string;
 }
 
-interface CategoriesState {
+export interface CategoriesState {
     categories: Category[];
     loading: boolean;
 }
@@ -16,10 +16,10 @@ const initialState: CategoriesState = {
     loading: false,
 };
 
-export const fetchCategories = createAsyncThunk(
+export const fetchCategories = createAsyncThunk<Category[], void, { state: RootState }>(
     'categories/fetchCategories',
     async (_, { getState }) => {
-        const state = getState() as RootState;
+        const state = getState();
         if (state.categories.categories.length > 0) {
             return state.categories.categories;
         }
@@ -33,7 +33,8 @@ export const fetchCategories = createAsyncThunk(
             method: 'GET',
             headers: headersList,
         });
-        return (await response.json()).results as Category[];
+        const data = await response.json();
+        return data.results as Category[];
     }
 );
 

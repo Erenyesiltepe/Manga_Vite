@@ -11,7 +11,7 @@ interface ProductItemProps {
     title: string;
 }
 
-const ProductItem: React.FC<ProductItemProps> = ({ imageUrl, episode, commentCount, viewCount, status, category, title }) => {
+const ProductItem: React.FC<ProductItemProps> = ({ imageUrl, episode, category, title }) => {
     return (
         <div className="col-lg-4 col-md-6 col-sm-6">
             <div className="product__item">
