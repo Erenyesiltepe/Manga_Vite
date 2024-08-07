@@ -13,7 +13,7 @@ type HeroCarouselProps = {
     heading: string;
 };
 
-const ProductSpad: React.FC<HeroCarouselProps> = ({ slides, heading }) => {
+const ProductSpad: React.FC<HeroCarouselProps> = ({ slides = [], heading }) => {
     return (
         <section className="product spad">
             <div className="container">
@@ -35,9 +35,8 @@ const ProductSpad: React.FC<HeroCarouselProps> = ({ slides, heading }) => {
                                 </div>
                             </div>
                             <div className="row">
-                                {slides.map((slide) => {
-                                    console.log(slide);
-                                    return (
+                                {Array.isArray(slides) && slides.length > 0 ? (
+                                    slides.map((slide) => (
                                         <div className="col-lg-4 col-md-6 col-sm-6" key={slide.id}>
                                             <div className="product__item">
                                                 <img
@@ -55,8 +54,10 @@ const ProductSpad: React.FC<HeroCarouselProps> = ({ slides, heading }) => {
                                                 </div>
                                             </div>
                                         </div>
-                                    );
-                                })}
+                                    ))
+                                ) : (
+                                    <p>No slides available</p>
+                                )}
                             </div>
                         </div>
                     </div>

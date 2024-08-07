@@ -43,7 +43,8 @@ function getSlides(): Promise<Slide[]> {
         method: "GET",
         headers: headersList
     }).then(async response => {
-        return await response.json();
+        const resp= await response.json();
+        return resp.results;
     });
 }
 
@@ -68,7 +69,7 @@ const Index: React.FC<Props> = () => {
                 </div>
             )}
             <Header categories={categories} />
-            <BCarousel slides={slides.slice(0, 5)} />
+            <BCarousel slides={Array.isArray(slides) ? slides.slice(0, 5) : []} />
             <ProductSpad slides={slides} heading="Trending"/>
             <Footer />
         </div>
