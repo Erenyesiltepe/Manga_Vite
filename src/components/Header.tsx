@@ -36,19 +36,19 @@ const Header: React.FC = () => {
                                         <Link to="/">HomePage</Link>
                                     </li>
                                     <li>
-                                        <Link to="/category">
+                                        <Link to="/categories">
                                             Categories <span className="arrow_carrot-down"></span>
                                         </Link>
                                         <ul className="dropdown">
                                             {categories.map((category) => (
                                                 <li key={category.id}>
-                                                    <Link to={`/category/${category.id}`}>{category.name}</Link>
+                                                    <Link to={`/categories/?category_id=${category.id}`}>{category.name}</Link>
                                                 </li>
                                             ))}
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="#">Contacts</a>
+                                        <Link to="/contacts">Contacts</Link>
                                     </li>
                                 </ul>
                             </nav>

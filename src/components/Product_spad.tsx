@@ -36,7 +36,6 @@ const ProductSpad: React.FC<HeroCarouselProps> = ({ slides, heading }) => {
                             </div>
                             <div className="row">
                                 {slides.map((slide) => {
-                                    console.log(slide);
                                     return (
                                         <div className="col-lg-4 col-md-6 col-sm-6" key={slide.id}>
                                             <div className="product__item">

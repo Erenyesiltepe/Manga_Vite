@@ -10,7 +10,8 @@ import Footer from '../components/Footer';
 
 const Category: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
-    const slides = useSelector((state: RootState) => state.slides.slideWrap.slides);
+    //const [slides,setSlide] =useState(useSelector((state: RootState) => state.slides.slideWrap.slides));
+    const slides = useSelector((state: RootState) => state.slides.slideWrap.slides)
     const count = useSelector((state: RootState) => state.slides.slideWrap.count);
     const loading = useSelector((state: RootState) => state.slides.loading || state.categories.loading);
     
@@ -23,12 +24,38 @@ const Category: React.FC = () => {
 
     const pageSize = 12;
 
+    // const sortSlides = (slides: Slide[], sortOrder: number) => {
+    //     const newSlides= slides.sort((a, b) => {
+    //         const titleA = a.title.toLowerCase();
+    //         const titleB = b.title.toLowerCase();
+    //         if (sortOrder === 1) {
+    //             return titleA.localeCompare(titleB); // Ascending
+    //         } else {
+    //             return titleB.localeCompare(titleA); // Descending
+    //         }
+    //     });
+    //     setSlide([...newSlides])
+    // };
+
+
+    // const [selectedOption, setSelectedOption] = useState(1);
+
+    // // Handler function to update the selected option
+    // const handleChange = (event:any) => {
+    //     const value = parseInt(event.target.value);
+    //     setSelectedOption(value);
+    //     sortSlides(slides, value);
+    // };
     useEffect(() => {
         // Fetch slides based on categoryId and currentPage
-        if (categoryId) {
-            dispatch(fetchSlides({ categoryId, pageSize, page: currentPage }));
+        if(categoryId){
+            dispatch(fetchSlides({ categoryId, pageSize, page: currentPage }))
+            console.log(categoryId)
         }
-
+        else{
+            dispatch(fetchSlides({ pageSize, page: currentPage }))
+        }    
+            
         // Fetch category name
         if (categoryId) {
             fetch(`${import.meta.env.VITE_API_URL}/api/mangas/categories/${categoryId}/`)
@@ -36,6 +63,9 @@ const Category: React.FC = () => {
                 .then((data) => {          
                     setCategoryName(data.name);
                 });
+        }
+        else{
+            setCategoryName('All Categories');
         }
     }, [categoryId, currentPage, dispatch]);
 
@@ -74,7 +104,7 @@ const Category: React.FC = () => {
             <section className="product-page spad">
                 <div className="container">
                     <div className="row">
-                        <div className="col-lg-8">
+                        <div className="col-lg-12">
                             <div className="product__page__content">
                                 <div className="product__page__title">
                                     <div className="row">
@@ -83,20 +113,11 @@ const Category: React.FC = () => {
                                                 <h4>{categoryName}</h4>
                                             </div>
                                         </div>
-                                        <div className="col-lg-4 col-md-4 col-sm-6">
-                                            <div className="product__page__filter">
-                                                <p>Order by:</p>
-                                                <select>
-                                                    <option value="">A-Z</option>
-                                                    <option value="">Z-A</option>
-                                                </select>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                                 <div className="row">
                                     {slides.map((slide) => (
-                                        <div className="col-lg-4 col-md-6 col-sm-6" key={slide.id}>
+                                        <div className="col-lg-3 col-md-6 col-sm-6" key={slide.id}>
                                             <div className="product__item">
                                                 <img
                                                     className="product__item__pic set-bg"
@@ -121,6 +142,7 @@ const Category: React.FC = () => {
                                     <Link
                                         to={`/categories/?current_page=${index + 1}&category_id=${categoryId}`}
                                         key={index + 1}
+                                        className={index + 1 === currentPage ? 'current-page' : ''}
                                     >
                                         {index + 1}
                                     </Link>

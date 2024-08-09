@@ -27,16 +27,10 @@ const initialState: SlidesState = {
 
 export const fetchSlides = createAsyncThunk<SlideWrap, { categoryId?: string, pageSize?: number, page?: number }, { state: RootState }>(
     'slides/fetchSlides',
-    async ({ categoryId, pageSize, page }, { getState }) => {
-        const state = getState();
-        // If slides are already loaded, return the current state
-        if (state.slides.slideWrap.slides.length > 0) {
-            return state.slides.slideWrap; // Return the whole SlideWrap
-        }
+    async ({ categoryId, pageSize, page }) => {
 
         const headersList = {
-            "Accept": "*/*",
-            "User-Agent": "Thunder Client (https://www.thunderclient.com)"
+            'Content-Type': 'application/json'
         };
 
         const parameters = new URLSearchParams();
@@ -45,16 +39,12 @@ export const fetchSlides = createAsyncThunk<SlideWrap, { categoryId?: string, pa
         if (page !== undefined) parameters.append("page", page.toString());
 
         const queryString = parameters.toString();
-        const url = `${import.meta.env.VITE_API_URL}/api/mangas/mangas${queryString ? '?' + queryString : ''}`;
+        const url = `${import.meta.env.VITE_API_URL}/api/mangas/mangas/${queryString ? '?' + queryString : ''}`;
 
         const response = await fetch(url, {
             method: 'GET',
             headers: headersList,
         });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
 
         const data = await response.json();
         return { slides: data.results as Slide[], count: data.count }; // Adjust based on actual API response
