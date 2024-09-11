@@ -15,7 +15,7 @@ type HeroCarouselProps = {
     heading: string;
 };
 
-const ProductSpad: React.FC<HeroCarouselProps> = ({ slides, heading }) => {
+const ProductSpad: React.FC<HeroCarouselProps> = ({ slides = [], heading }) => {
     return (
         <section className="product spad">
             <div className="container">
@@ -56,8 +56,8 @@ const ProductSpad: React.FC<HeroCarouselProps> = ({ slides, heading }) => {
                                                 </div>
                                             </div>
                                         </div>
-                                    );
-                                })}
+                                    )})
+                                }
                             </div>
                         </div>
                     </div>
