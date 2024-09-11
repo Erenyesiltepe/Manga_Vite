@@ -3,19 +3,18 @@ import logo from './images/logo.png'; // Adjust the path accordingly
 // import { faSearch, faUser } from '@fortawesome/free-solid-svg-icons';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from 'react-router-dom';
-
-import { useEffect } from 'react';
-import { fetchCategories } from '../store/categoriesSlice';
-import { RootState, AppDispatch } from '../store';
-import { useSelector, useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
 
 const Header: React.FC = () => {
-    const dispatch: AppDispatch = useDispatch();
-    const categories = useSelector((state: RootState) => state.categories.categories);
+    const [categories, setCategories] = useState([]);
 
     useEffect(() => {
-        dispatch(fetchCategories());
-    }, [dispatch]);
+        fetch(`${import.meta.env.VITE_API_URL}/api/mangas/categories/`)
+            .then((response) => response.json())
+            .then((data) => {
+                setCategories(data.results);
+            })
+    }, []);
 
     return (
         <header className="header">

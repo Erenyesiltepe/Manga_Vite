@@ -129,7 +129,7 @@ const Category: React.FC = () => {
                                                         <li>{slide.category_name}</li> {/* Show category name if available */}
                                                     </ul>
                                                     <h5>
-                                                        <a href="#">{slide.title}</a>
+                                                    <Link to={`/mangaDetails/?manga=${slide.id}&category=${slide.category_name}`}>{slide.title}</Link>
                                                     </h5>
                                                 </div>
                                             </div>

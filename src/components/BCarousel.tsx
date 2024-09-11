@@ -3,13 +3,15 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { Pagination, Navigation, Autoplay } from 'swiper/modules';
+import { Link } from 'react-router-dom';
 
 type Slide = {
   id: number;
   title: string;
   thumbnail: string;
   description: string;
-  category: string | number;
+  category: number;
+  category_name: string;
 };
 
 type HeroCarouselProps = {
@@ -30,9 +32,13 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ slides }) => {
           className="swiper"
         >
           {slides.map((slide) => (
-            <SwiperSlide key={slide.id} >
-              <img src={slide.thumbnail} alt={slide.title} width={1080} height={800} loading="lazy" style={{ display: "block", margin: "0 auto" }} />
-            </SwiperSlide>
+            
+              <SwiperSlide key={slide.id} >
+                <Link to={`/mangaDetails/?manga=${slide.id}&category=${slide.category_name}`} key={slide.id}>
+                <img src={slide.thumbnail} alt={slide.title} width={900} height={750} loading="lazy" style={{ display: "block", margin: "0 auto" }} />
+                <p style={{ position: "absolute", bottom: "50px", left: "150px", color: "#fff", fontSize: "24px", background: "grey" }}>{slide.title}</p>
+                </Link>
+              </SwiperSlide>
           ))}
         </Swiper>
       ) : (

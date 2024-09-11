@@ -1,11 +1,13 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 type Slide = {
     id: number;
     title: string;
     thumbnail: string;
     description: string;
-    category: string | number;
+    category: number;
+    category_name: string;
 };
 
 type HeroCarouselProps = {
@@ -49,7 +51,7 @@ const ProductSpad: React.FC<HeroCarouselProps> = ({ slides, heading }) => {
                                                         <li>{slide.category}</li>
                                                     </ul>
                                                     <h5>
-                                                        <a href="#">{slide.title}</a>
+                                                    <Link to={`/mangaDetails/?manga=${slide.id}&category=${slide.category_name}`}>{slide.title}</Link>
                                                     </h5>
                                                 </div>
                                             </div>
