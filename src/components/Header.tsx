@@ -3,13 +3,19 @@ import logo from './images/logo.png'; // Adjust the path accordingly
 // import { faSearch, faUser } from '@fortawesome/free-solid-svg-icons';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
-type Category = { id: number; name: string };
-type CategoriesProps = {
-    categories: Category[];
-};
+const Header: React.FC = () => {
+    const [categories, setCategories] = useState([]);
 
-const Header: React.FC<CategoriesProps> = ({ categories }) => {
+    useEffect(() => {
+        fetch(`${import.meta.env.VITE_API_URL}/api/mangas/categories/`)
+            .then((response) => response.json())
+            .then((data) => {
+                setCategories(data.results);
+            })
+    }, []);
+
     return (
         <header className="header">
             <div className="container">
@@ -29,19 +35,19 @@ const Header: React.FC<CategoriesProps> = ({ categories }) => {
                                         <Link to="/">HomePage</Link>
                                     </li>
                                     <li>
-                                        <a href="./categories.html">
+                                        <Link to="/categories">
                                             Categories <span className="arrow_carrot-down"></span>
-                                        </a>
+                                        </Link>
                                         <ul className="dropdown">
                                             {categories.map((category) => (
                                                 <li key={category.id}>
-                                                    <a href={`./category/${category.id}`}>{category.name}</a>
+                                                    <Link to={`/categories/?category_id=${category.id}`}>{category.name}</Link>
                                                 </li>
                                             ))}
                                         </ul>
                                     </li>
                                     <li>
-                                        <a href="#">Contacts</a>
+                                        <Link to="/contacts">Contacts</Link>
                                     </li>
                                 </ul>
                             </nav>
