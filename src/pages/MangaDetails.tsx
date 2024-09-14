@@ -8,24 +8,44 @@ import Footer from "../components/Footer";
 
 const MangaDetails = () => {
     const [searchParams] = useSearchParams();
-    const category = searchParams.get('category');
     const manga = searchParams.get('manga');
 
-    if (!category || !manga) {
+    if (!manga) {
         redirect('/categories');
     }
 
     const [mangaDetails, setMangaDetails] = useState<any>({});
+    const [mangaEpisodes, setMangaEpisodes] = useState<any>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_URL}/api/mangas/mangas/${manga}/`)
-            .then((response) => response.json())
-            .then((data) => {
-                setMangaDetails(data);
-                setLoading(false);
-            });
+        if (manga) {
+            fetch(`${import.meta.env.VITE_API_URL}/api/mangas/mangas/${manga}/`)
+                .then((response) => response.json())
+                .then((data) => {
+                    setMangaDetails(data);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
     }, [manga]);
+
+    useEffect(() => {
+        if (mangaDetails.id) {
+            fetch(`${import.meta.env.VITE_API_URL}/api/mangas/episodes/${mangaDetails.id}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    setMangaEpisodes(data.results);
+                    console.log(data.results);
+                    setLoading(false);
+                })
+                .catch((error) => {
+                    console.error(error);
+                    setLoading(false);
+                });
+        }
+    }, [mangaDetails.id]);
     return (
         <>
             {loading && (
@@ -42,7 +62,8 @@ const MangaDetails = () => {
                             <div className="breadcrumb__links">
                                 <Link to="/"><FontAwesomeIcon icon={faHome} width={15}/> Home</Link>
                                 <Link to="/categories">Categories</Link>
-                                <span>{category}</span>
+                                <Link to={`/categories/?category=${mangaDetails.category}`}>{mangaDetails.category_name}</Link>
+                                <span>{mangaDetails.title}</span>
                             </div>
                         </div>
                     </div>
@@ -61,11 +82,10 @@ const MangaDetails = () => {
                                     <img className="anime__details__img" src={`${mangaDetails.thumbnail}`} alt="Anime Details" style={{ objectFit: 'cover', width: '100%', height: '100%', objectPosition: 'top' }} />
                                 </div>
                             </div>
-                            <div className="col-lg-9">
+                            <div className="col-lg-6">
                                 <div className="anime__details__text">
                                     <div className="anime__details__title">
                                         <h3>{mangaDetails.title}</h3>
-                                        {/* <span>フェイト／ステイナイト, Feito／sutei naito</span> */}
                                     </div>
                                     {/* <div className="anime__details__rating">
                                         <div className="rating">
@@ -101,7 +121,6 @@ const MangaDetails = () => {
                                         </div>
                                     </div>
                                     <div className="anime__details__btn">
-                                        {/* <a href="#" className="follow-btn"><i className="fa fa-heart-o"></i> Follow</a> */}
                                         <Link to={`/mangaRead/?manga=${mangaDetails.id}`} className="watch-btn">
                                         <span>
                                             Read Now
@@ -111,16 +130,33 @@ const MangaDetails = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-lg-9">
-                                
+                            <div className="col-lg-3 scroll-box" style={{ maxHeight: 'max-parent', overflowY: 'scroll', border: '1px solid white', borderRadius: '5px', color: 'white' }}>
+                            
+                                    {mangaDetails && mangaEpisodes && mangaEpisodes.length > 0 ? (
+                                        mangaEpisodes.map((episode: any) => (
+                                            <Link 
+                                                to={`/mangaRead/?manga=${mangaDetails.id}&episode=${episode.id}`} 
+                                                key={episode.id} 
+                                                style={{ 
+                                                    color: 'white', 
+                                                    backgroundColor: episode.id % 2 === 0 ? 'red' : 'grey', 
+                                                    display: 'block', 
+                                                    padding: '10px', 
+                                                    transition: 'transform 0.2s' 
+                                                }} 
+                                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'} 
+                                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                            >
+                                                Chapter {episode.chapter_number}: {episode.title}
+                                            </Link>
+                                        ))
+                                        
+                                    ) : (
+                                        <div className="anime__details__episodes__item">
+                                            <span>Currently no episodes released</span>
+                                        </div>
+                                    )}
                             </div>
-                            <div className="anime__details__episodes__list" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                                        {mangaDetails.episodes.map((episode: any) => (
-                                            <div className="anime__details__episodes__item" key={episode.id}>
-                                                <span>Chapter {episode.chapter_number}: {episode.title}</span>
-                                            </div>
-                                        ))}
-                                    </div>
                         </div>
                         {/* <div className="row">
                             <div className="col-lg-8 col-md-8">
@@ -226,8 +262,6 @@ const MangaDetails = () => {
                     </div>
                 </div>
             </section>
-
-
           <Footer/>
         </>
     );

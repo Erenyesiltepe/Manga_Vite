@@ -34,10 +34,12 @@ const HeroCarousel: React.FC<HeroCarouselProps> = ({ slides }) => {
           {slides.map((slide) => (
             
               <SwiperSlide key={slide.id} >
-                <Link to={`/mangaDetails/?manga=${slide.id}&category=${slide.category_name}`} key={slide.id}>
-                <img src={slide.thumbnail} alt={slide.title} width={900} height={750} loading="lazy" style={{ display: "block", margin: "0 auto" }} />
-                <p style={{ position: "absolute", bottom: "50px", left: "150px", color: "#fff", fontSize: "24px", background: "grey" }}>{slide.title}</p>
-                </Link>
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <Link to={`/mangaDetails/?manga=${slide.id}&category=${slide.category_name}`} key={slide.id}>
+                    <img src={slide.thumbnail} alt={slide.title} width={900} height={750} loading="lazy" style={{ display: "block" }} />
+                    <p style={{ position: "absolute", bottom: "50px", left: "150px", color: "#fff", fontSize: "24px", background: "grey" }}>{slide.title}</p>
+                  </Link>
+                </div>
               </SwiperSlide>
           ))}
         </Swiper>
