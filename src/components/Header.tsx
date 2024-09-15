@@ -6,7 +6,12 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 const Header: React.FC = () => {
-    const [categories, setCategories] = useState([]);
+    interface Category {
+        id: number;
+        name: string;
+    }
+    
+    const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
         fetch(`${import.meta.env.VITE_API_URL}/api/mangas/categories/`)
