@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title id="title">Vite + React + TS</title>
     <script>
-      fetch(`http://16.170.107.226/api/settings/`)
+      fetch(`https://16.170.107.226/api/settings/`)
       .then(response => response.json())
       .then(data => {
             const titleElement = document.getElementById('title');
@@ -18,7 +18,7 @@
 
             const linkElement = document.getElementById('svg');
             if (linkElement) {
-              linkElement.href = "http://16.170.107.226"+data.favicon; // Assuming data.icon contains the new href
+              linkElement.href = data.favicon; // Assuming data.icon contains the new href
             } else {
               console.error('Link element not found');
             }

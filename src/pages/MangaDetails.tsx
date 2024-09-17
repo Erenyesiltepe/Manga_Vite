@@ -1,43 +1,65 @@
 import { faAngleRight, faHome } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
-import { Link, useSearchParams, redirect } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
+interface MangaDetails {
+    id: number;
+    title: string;
+    category: string;
+    category_name: string;
+    thumbnail: string;
+    description: string;
+}
+
+interface MangaEpisode {
+    id: number;
+    chapter_number: number;
+    title: string;
+}
 
 const MangaDetails = () => {
     const [searchParams] = useSearchParams();
     const manga = searchParams.get('manga');
+    const navigate = useNavigate();
+    
+    // Redirect to categories page if no manga is selected
+    useEffect(() => {
+        if (!manga) {
+            navigate('/categories');
+        }
+    }, [manga, navigate]);
 
-    if (!manga) {
-        redirect('/categories');
-    }
-
-    const [mangaDetails, setMangaDetails] = useState<any>({});
-    const [mangaEpisodes, setMangaEpisodes] = useState<any>([]);
+    const [mangaDetails, setMangaDetails] = useState<MangaDetails | undefined>(undefined);
+    const [mangaEpisodes, setMangaEpisodes] = useState<MangaEpisode[]>([]);
     const [loading, setLoading] = useState(true);
 
+    // Fetch manga details
     useEffect(() => {
         if (manga) {
             fetch(`${import.meta.env.VITE_API_URL}/api/mangas/mangas/${manga}/`)
                 .then((response) => response.json())
                 .then((data) => {
                     setMangaDetails(data);
+                    setLoading(false);
                 })
                 .catch((error) => {
                     console.error(error);
+                    setLoading(false);
                 });
         }
     }, [manga]);
 
+    // Fetch manga episodes based on mangaDetails.id
     useEffect(() => {
-        if (mangaDetails.id) {
+        if (mangaDetails?.id) {
+            setLoading(true);
             fetch(`${import.meta.env.VITE_API_URL}/api/mangas/episodes/${mangaDetails.id}`)
                 .then((response) => response.json())
                 .then((data) => {
                     setMangaEpisodes(data.results);
-                    console.log(data.results);
                     setLoading(false);
                 })
                 .catch((error) => {
@@ -45,7 +67,8 @@ const MangaDetails = () => {
                     setLoading(false);
                 });
         }
-    }, [mangaDetails.id]);
+    }, [mangaDetails?.id]);
+
     return (
         <>
             {loading && (
@@ -53,17 +76,24 @@ const MangaDetails = () => {
                     <div className="loader"></div>
                 </div>
             )}
-            <Header/>
+            <Header />
+
             {/* Breadcrumb Begin */}
             <div className="breadcrumb-option">
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-12">
                             <div className="breadcrumb__links">
-                                <Link to="/"><FontAwesomeIcon icon={faHome} width={15}/> Home</Link>
+                                <Link to="/"><FontAwesomeIcon icon={faHome} width={15} /> Home</Link>
                                 <Link to="/categories">Categories</Link>
-                                <Link to={`/categories/?category=${mangaDetails.category}`}>{mangaDetails.category_name}</Link>
-                                <span>{mangaDetails.title}</span>
+                                {mangaDetails && (
+                                    <>
+                                        <Link to={`/categories/?category=${mangaDetails.category}`}>
+                                            {mangaDetails.category_name}
+                                        </Link>
+                                        <span>{mangaDetails.title}</span>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -71,198 +101,93 @@ const MangaDetails = () => {
             </div>
             {/* Breadcrumb End */}
 
-
-            {/* Anime Section Begin */}
+            {/* Manga Details Section Begin */}
             <section className="anime-details spad">
                 <div className="container">
                     <div className="anime__details__content">
                         <div className="row">
+                            {/* Manga Thumbnail */}
                             <div className="col-lg-3">
-                                <div className="anime__details__pic" style={{ width: "wrap-content" }}>
-                                    <img className="anime__details__img" src={`${mangaDetails.thumbnail}`} alt="Anime Details" style={{ objectFit: 'cover', width: '100%', height: '100%', objectPosition: 'top' }} />
+                                <div className="anime__details__pic" style={{ width: "100%" }}>
+                                    {mangaDetails?.thumbnail && (
+                                        <img
+                                            className="anime__details__img"
+                                            src={mangaDetails.thumbnail}
+                                            alt={mangaDetails.title}
+                                            style={{ objectFit: 'cover', width: '100%', height: '100%', objectPosition: 'top' }}
+                                        />
+                                    )}
                                 </div>
                             </div>
+
+                            {/* Manga Info */}
                             <div className="col-lg-6">
                                 <div className="anime__details__text">
-                                    <div className="anime__details__title">
-                                        <h3>{mangaDetails.title}</h3>
-                                    </div>
-                                    {/* <div className="anime__details__rating">
-                                        <div className="rating">
-                                            <a href="#"><i className="fa fa-star"></i></a>
-                                            <a href="#"><i className="fa fa-star"></i></a>
-                                            <a href="#"><i className="fa fa-star"></i></a>
-                                            <a href="#"><i className="fa fa-star"></i></a>
-                                            <a href="#"><i className="fa fa-star-half-o"></i></a>
-                                        </div>
-                                        <span>1.029 Votes</span>
-                                    </div> */}
-                                    <p>{mangaDetails.description}</p>
-                                    <div className="anime__details__widget">
-                                        <div className="row">
-                                            <div className="col-lg-6 col-md-6">
+                                    {mangaDetails && (
+                                        <>
+                                            <div className="anime__details__title">
+                                                <h3>{mangaDetails.title}</h3>
+                                            </div>
+                                            <p>{mangaDetails.description}</p>
+                                            <div className="anime__details__widget">
                                                 <ul>
-                                                    {/* <li><span>Type:</span> TV Series</li>
-                                                    <li><span>Studios:</span> Lerche</li>
-                                                    <li><span>Date aired:</span> Oct 02, 2019 to ?</li>
-                                                    <li><span>Status:</span> Airing</li> */}
-                                                    <li><span>Genre:</span>{mangaDetails.category_name}</li>
+                                                    <li><span>Genre:</span> {mangaDetails.category_name}</li>
                                                 </ul>
                                             </div>
-                                            {/* <div className="col-lg-6 col-md-6">
-                                                <ul>
-                                                    <li><span>Scores:</span> 7.31 / 1,515</li>
-                                                    <li><span>Rating:</span> 8.5 / 161 times</li>
-                                                    <li><span>Duration:</span> 24 min/ep</li>
-                                                    <li><span>Quality:</span> HD</li>
-                                                    <li><span>Views:</span> 131,541</li>
-                                                </ul>
-                                            </div> */}
-                                        </div>
-                                    </div>
-                                    <div className="anime__details__btn">
-                                        <Link to={`/mangaRead/?manga=${mangaDetails.id}`} className="watch-btn">
-                                        <span>
-                                            Read Now
-                                            <FontAwesomeIcon icon={faAngleRight} width={15}/>
-                                        </span>    
-                                        </Link>
-                                    </div>
+                                            <div className="anime__details__btn">
+                                                <Link to={`/mangaRead/?manga=${mangaDetails.id}`} className="watch-btn">
+                                                    <span>
+                                                        Read Now
+                                                        <FontAwesomeIcon icon={faAngleRight} width={15} />
+                                                    </span>
+                                                </Link>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
-                            <div className="col-lg-3 scroll-box" style={{ maxHeight: 'max-parent', overflowY: 'scroll', border: '1px solid white', borderRadius: '5px', color: 'white' }}>
-                            
-                                    {mangaDetails && mangaEpisodes && mangaEpisodes.length > 0 ? (
-                                        mangaEpisodes.map((episode: any) => (
-                                            <Link 
-                                                to={`/mangaRead/?manga=${mangaDetails.id}&episode=${episode.id}`} 
-                                                key={episode.id} 
-                                                style={{ 
-                                                    color: 'white', 
-                                                    backgroundColor: episode.id % 2 === 0 ? 'red' : 'grey', 
-                                                    display: 'block', 
-                                                    padding: '10px', 
-                                                    transition: 'transform 0.2s' 
-                                                }} 
-                                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'} 
-                                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                            >
-                                                Chapter {episode.chapter_number}: {episode.title}
-                                            </Link>
-                                        ))
-                                        
-                                    ) : (
-                                        <div className="anime__details__episodes__item">
-                                            <span>Currently no episodes released</span>
-                                        </div>
-                                    )}
+
+                            {/* Manga Episodes List */}
+                            <div
+                                className="col-lg-3 scroll-box"
+                                style={{
+                                    maxHeight: '100%',
+                                    overflowY: 'scroll',
+                                    border: '1px solid white',
+                                    borderRadius: '5px',
+                                    color: 'white',
+                                }}
+                            >
+                                {mangaEpisodes.length > 0 ? (
+                                    mangaEpisodes.map((episode: MangaEpisode) => (
+                                        <Link
+                                            to={`/mangaRead/?manga=${mangaDetails?.id}&episode=${episode.id}`}
+                                            key={episode.id}
+                                            style={{
+                                                color: 'white',
+                                                backgroundColor: episode.id % 2 === 0 ? 'red' : 'grey',
+                                                display: 'block',
+                                                padding: '10px',
+                                                transition: 'transform 0.2s',
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                        >
+                                            Chapter {episode.chapter_number}: {episode.title}
+                                        </Link>
+                                    ))
+                                ) : (
+                                    <div className="anime__details__episodes__item">
+                                        <span>Currently no episodes released</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                        {/* <div className="row">
-                            <div className="col-lg-8 col-md-8">
-                                <div className="anime__details__review">
-                                    <div className="section-title">
-                                        <h5>Reviews</h5>
-                                    </div>
-                                    <div className="anime__review__item">
-                                        <div className="anime__review__item__pic">
-                                            <img src="img/anime/review-1.jpg" alt="" />
-                                        </div>
-                                        <div className="anime__review__item__text">
-                                            <h6>Chris Curry - <span>1 Hour ago</span></h6>
-                                            <p>whachikan Just noticed that someone categorized this as belonging to the genre
-                                                "demons" LOL</p>
-                                        </div>
-                                    </div>
-                                    <div className="anime__review__item">
-                                        <div className="anime__review__item__pic">
-                                            <img src="img/anime/review-2.jpg" alt="" />
-                                        </div>
-                                        <div className="anime__review__item__text">
-                                            <h6>Lewis Mann - <span>5 Hour ago</span></h6>
-                                            <p>Finally it came out ages ago</p>
-                                        </div>
-                                    </div>
-                                    <div className="anime__review__item">
-                                        <div className="anime__review__item__pic">
-                                            <img src="img/anime/review-3.jpg" alt="" />
-                                        </div>
-                                        <div className="anime__review__item__text">
-                                            <h6>Louis Tyler - <span>20 Hour ago</span></h6>
-                                            <p>Where is the episode 15 ? Slow update! Tch</p>
-                                        </div>
-                                    </div>
-                                    <div className="anime__review__item">
-                                        <div className="anime__review__item__pic">
-                                            <img src="img/anime/review-4.jpg" alt="" />
-                                        </div>
-                                        <div className="anime__review__item__text">
-                                            <h6>Chris Curry - <span>1 Hour ago</span></h6>
-                                            <p>whachikan Just noticed that someone categorized this as belonging to the genre
-                                                "demons" LOL</p>
-                                        </div>
-                                    </div>
-                                    <div className="anime__review__item">
-                                        <div className="anime__review__item__pic">
-                                            <img src="img/anime/review-5.jpg" alt="" />
-                                        </div>
-                                        <div className="anime__review__item__text">
-                                            <h6>Lewis Mann - <span>5 Hour ago</span></h6>
-                                            <p>Finally it came out ages ago</p>
-                                        </div>
-                                    </div>
-                                    <div className="anime__review__item">
-                                        <div className="anime__review__item__pic">
-                                            <img src="img/anime/review-6.jpg" alt="" />
-                                        </div>
-                                        <div className="anime__review__item__text">
-                                            <h6>Louis Tyler - <span>20 Hour ago</span></h6>
-                                            <p>Where is the episode 15 ? Slow update! Tch</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="anime__details__form">
-                                    <div className="section-title">
-                                        <h5>Your Comment</h5>
-                                    </div>
-                                    <form action="#">
-                                        <textarea placeholder="Your Comment"></textarea>
-                                        <button type="submit"><i className="fa fa-location-arrow"></i> Review</button>
-                                    </form>
-                                </div>
-                            </div>
-                            <div className="col-lg-4 col-md-4">
-                                <div className="anime__details__sidebar">
-                                    <div className="section-title">
-                                        <h5>you might like...</h5>
-                                    </div>
-                                    <div className="product__sidebar__view__item set-bg" data-setbg="img/sidebar/tv-1.jpg">
-                                        <div className="ep">18 / ?</div>
-                                        <div className="view"><i className="fa fa-eye"></i> 9141</div>
-                                        <h5><a href="#">Boruto: Naruto next generations</a></h5>
-                                    </div>
-                                    <div className="product__sidebar__view__item set-bg" data-setbg="img/sidebar/tv-2.jpg">
-                                        <div className="ep">18 / ?</div>
-                                        <div className="view"><i className="fa fa-eye"></i> 9141</div>
-                                        <h5><a href="#">The Seven Deadly Sins: Wrath of the Gods</a></h5>
-                                    </div>
-                                    <div className="product__sidebar__view__item set-bg" data-setbg="img/sidebar/tv-3.jpg">
-                                        <div className="ep">18 / ?</div>
-                                        <div className="view"><i className="fa fa-eye"></i> 9141</div>
-                                        <h5><a href="#">Sword art online alicization war of underworld</a></h5>
-                                    </div>
-                                    <div className="product__sidebar__view__item set-bg" data-setbg="img/sidebar/tv-4.jpg">
-                                        <div className="ep">18 / ?</div>
-                                        <div className="view"><i className="fa fa-eye"></i> 9141</div>
-                                        <h5><a href="#">Fate/stay night: Heaven's Feel I. presage flower</a></h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> */}
                     </div>
                 </div>
             </section>
-          <Footer/>
+            {/* Manga Details Section End */}
+            <Footer />
         </>
     );
 };
