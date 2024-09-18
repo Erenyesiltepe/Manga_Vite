@@ -2,6 +2,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import logo from "../../manga_logo.jpeg"
 
 const Header: React.FC = () => {
     interface Category {
@@ -19,29 +20,6 @@ const Header: React.FC = () => {
             })
     }, []);
 
-    interface Settings {
-        id: number;
-        title: string;
-        logo: string;
-        favicon: string;
-        // Add other properties as needed
-    }
-    
-    const [settings, setSettings] = useState<Settings>({
-        id: 0,
-        title: "",
-        logo: "",
-        favicon: ""
-    });
-
-    useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_URL}/api/settings/`)
-            .then((response) => response.json())
-            .then((data) => {
-                setSettings(data);
-            })
-    }, []);
-
     return (
         <header className="header">
             <div className="container">
@@ -49,7 +27,7 @@ const Header: React.FC = () => {
                     <div className="col-lg-2">
                         <div className="header__logo">
                             <Link to="/">
-                                <img src={settings.logo} width={50} alt="Logo" />
+                                <img src={logo} width={50} alt="Logo" />
                             </Link>
                         </div>
                     </div>

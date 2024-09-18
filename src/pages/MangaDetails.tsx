@@ -1,4 +1,4 @@
-import { faAngleRight, faHome } from "@fortawesome/free-solid-svg-icons";
+import { faHome } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
@@ -134,14 +134,14 @@ const MangaDetails = () => {
                                                     <li><span>Genre:</span> {mangaDetails.category_name}</li>
                                                 </ul>
                                             </div>
-                                            <div className="anime__details__btn">
+                                            {/* <div className="anime__details__btn">
                                                 <Link to={`/mangaRead/?manga=${mangaDetails.id}`} className="watch-btn">
                                                     <span>
                                                         Read Now
                                                         <FontAwesomeIcon icon={faAngleRight} width={15} />
                                                     </span>
                                                 </Link>
-                                            </div>
+                                            </div> */}
                                         </>
                                     )}
                                 </div>
