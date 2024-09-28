@@ -2,18 +2,22 @@ import { faHome } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchSlides } from '../store/slidesSlice';
-import { RootState, AppDispatch } from '../store';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
+interface Slide {
+    id: number;
+    title: string;
+    thumbnail: string;
+    description: string;
+    category: number;
+    category_name: string;
+}
+
 const Category: React.FC = () => {
-    const dispatch: AppDispatch = useDispatch();
-    //const [slides,setSlide] =useState(useSelector((state: RootState) => state.slides.slideWrap.slides));
-    const slides = useSelector((state: RootState) => state.slides.slideWrap.slides)
-    const count = useSelector((state: RootState) => state.slides.slideWrap.count);
-    const loading = useSelector((state: RootState) => state.slides.loading || state.categories.loading);
+
+    const [slides,setSlides] =useState<Slide[]>([]);
+    const [loading,setLoading] = useState(true);
     
     const [categoryName, setCategoryName] = useState<string | undefined>();
     const [pageCount, setPageCount] = useState<number>(1);
@@ -24,37 +28,24 @@ const Category: React.FC = () => {
 
     const pageSize = 12;
 
-    // const sortSlides = (slides: Slide[], sortOrder: number) => {
-    //     const newSlides= slides.sort((a, b) => {
-    //         const titleA = a.title.toLowerCase();
-    //         const titleB = b.title.toLowerCase();
-    //         if (sortOrder === 1) {
-    //             return titleA.localeCompare(titleB); // Ascending
-    //         } else {
-    //             return titleB.localeCompare(titleA); // Descending
-    //         }
-    //     });
-    //     setSlide([...newSlides])
-    // };
-
-
-    // const [selectedOption, setSelectedOption] = useState(1);
-
-    // // Handler function to update the selected option
-    // const handleChange = (event:any) => {
-    //     const value = parseInt(event.target.value);
-    //     setSelectedOption(value);
-    //     sortSlides(slides, value);
-    // };
     useEffect(() => {
         // Fetch slides based on categoryId and currentPage
-        if(categoryId){
-            dispatch(fetchSlides({ categoryId, pageSize, page: currentPage }))
-            console.log(categoryId)
-        }
-        else{
-            dispatch(fetchSlides({ pageSize, page: currentPage }))
-        }    
+        const parameters = new URLSearchParams();
+        if (categoryId) parameters.append("category_id", categoryId);
+        if (pageSize !== undefined) parameters.append("pageSize", pageSize.toString());
+        if (currentPage !== undefined) parameters.append("page", currentPage.toString());
+        
+        const queryString = parameters.toString();
+        const url = `${import.meta.env.VITE_API_URL}/api/mangas/mangas/${queryString ? '?' + queryString : ''}`;
+
+        fetch(url, {method: 'GET'})
+            .then((response) => response.json())
+            .then((data) => {          
+                setSlides(data.results);
+                setPageCount(Math.ceil(data.count / pageSize));
+                setLoading(false);
+            });
+
             
         // Fetch category name
         if (categoryId) {
@@ -67,12 +58,7 @@ const Category: React.FC = () => {
         else{
             setCategoryName('All Categories');
         }
-    }, [categoryId, currentPage, dispatch]);
-
-    useEffect(() => {
-        // Update page count based on the count of slides
-        setPageCount(Math.ceil(count / pageSize));
-    }, [count]);
+    }, [categoryId, currentPage]);
 
     return (
         <>

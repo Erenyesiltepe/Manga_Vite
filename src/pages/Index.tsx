@@ -1,20 +1,23 @@
-import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
 import BCarousel from '../components/BCarousel';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import ProductSpad from '../components/Product_spad';
-import { fetchSlides } from '../store/slidesSlice';
-import { RootState, AppDispatch } from '../store';
 
 const Index: React.FC = () => {
-    const dispatch: AppDispatch = useDispatch();
-    const slides = useSelector((state: RootState) => state.slides.slideWrap.slides);
-    const loading = useSelector((state: RootState) => state.slides.loading || state.categories.loading);
-
-    useEffect(() => {
-        dispatch(fetchSlides({}));
-    }, [dispatch]);
+    const [slides, setSlides] = useState([]);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {   
+        const url = `${import.meta.env.VITE_API_URL}/api/mangas/mangas/?limit=10`;
+        fetch(url, {method: 'GET'})
+            .then((response) => response.json())
+            .then((data) => {          
+                setSlides(data.results);
+                setLoading(false);
+            });
+        
+    }, []);
 
     return (
         <div style={{ height: "100%", width: "100%", alignItems: "center", justifyContent: "center" }}>
